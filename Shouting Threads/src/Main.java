@@ -17,8 +17,14 @@ class ExampleThread implements Runnable{
         this.shouts = shouts;
     }
 
+    //
     private void busyWait() {
         int cycles = 3 + randomNumber.nextInt(4);
+        boolean condition = true;
+        while (condition){
+            Thread.yield();
+            condition = false;
+        }
         for (int i = 0; i < cycles; i++){
             Thread.yield();
         }
@@ -36,7 +42,7 @@ class ExampleThread implements Runnable{
     }
 }
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter the number of threads: ");
@@ -46,12 +52,18 @@ public class Main {
         System.out.print("Enter the number of times each thread should shout: ");
         int S = scanner.nextInt();
 
-        int totalShouts = T * S;
 
 
-        ExampleThread t1 = new ExampleThread(1, totalShouts);
-        Thread t2 = new Thread(t1);
-        t2.start();
+        Thread[] threads = new Thread[T];
+
+        for (int i = 0; i < T; i++){
+            threads[i] = new Thread(new ExampleThread(i, S));
+            threads[i].start();
+        }
+
+        for (Thread t : threads) {
+            t.join();
+        }
 
 
         
